@@ -14,6 +14,12 @@ public class SteamLobby : MonoBehaviour
     protected Callback<GameLobbyJoinRequested_t> JoinRequestCallback;
     protected Callback<LobbyEnter_t> LobbyEnteredCallback;
 
+    //Lobbies callbacks
+    protected Callback<LobbyMatchList_t> LobbyListCallback;
+    protected Callback<LobbyDataUpdate_t> LobbyDataUpdatedCallback;
+
+    public List<CSteamID> lobbyIDS = new List<CSteamID>();
+
     //Vars
     public ulong currentLobbyID;
     private const string hostAddressKey = "HostAddress";
@@ -31,11 +37,14 @@ public class SteamLobby : MonoBehaviour
         LobbyCreatedCallback = Callback<LobbyCreated_t>.Create(OnLobbyCreated);
         JoinRequestCallback = Callback<GameLobbyJoinRequested_t>.Create(OnJoinRequest);
         LobbyEnteredCallback = Callback<LobbyEnter_t>.Create(OnLobbyEntered);
+
+        LobbyListCallback = Callback<LobbyMatchList_t>.Create(OnGetLobbyList);
+        LobbyDataUpdatedCallback = Callback<LobbyDataUpdate_t>.Create(OnGetLobbyData);
     }
 
     public void HostLobby()
     {
-        SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypeFriendsOnly, networkManager.maxConnections);
+        SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePublic, networkManager.maxConnections);
     }
 
     private void OnLobbyCreated(LobbyCreated_t callback)
@@ -71,4 +80,33 @@ public class SteamLobby : MonoBehaviour
 
         networkManager.StartClient();
     }
+
+    public void JoinLobby(CSteamID lobbyID)
+    {
+        SteamMatchmaking.JoinLobby(lobbyID);
+    }
+
+    public void GetLobbiesList()
+    {
+        if (lobbyIDS.Count > 0) lobbyIDS.Clear();
+
+        SteamMatchmaking.AddRequestLobbyListDistanceFilter(ELobbyDistanceFilter.k_ELobbyDistanceFilterWorldwide);
+        SteamMatchmaking.RequestLobbyList();
+    }
+
+    public void OnGetLobbyList(LobbyMatchList_t result)
+    {
+        Debug.Log("getting lobbies");
+        if (LobbiesListManager.instance.listOfLobbies.Count > 0)
+            LobbiesListManager.instance.DestroyLobbies();
+
+        for(int i = 0; i< result.m_nLobbiesMatching; i++)
+        {
+            CSteamID lobbyID = SteamMatchmaking.GetLobbyByIndex(i);
+            lobbyIDS.Add(lobbyID);
+            SteamMatchmaking.RequestLobbyData(lobbyID);
+        }
+    }
+
+    public void OnGetLobbyData(LobbyDataUpdate_t result) => LobbiesListManager.instance.DisplayLobbies(lobbyIDS, result);
 }

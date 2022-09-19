@@ -5,28 +5,23 @@ using UnityEngine.SceneManagement;
 public class PlayerMovement : NetworkBehaviour
 {
 
-    public GameObject playerModel;
-
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
     }
 
-    private void Start()
-    {
-        playerModel.SetActive(false);
-    }
+    private bool hasInitialized;
 
     private void Update()
     {
-        if(SceneManager.GetActiveScene().name == "Map1")
+        if(GetComponent<PlayerObjectController>().IsInGameScene())
         {
-            if (!playerModel.activeSelf)
+            if (!hasInitialized && GetComponent<PlayerObjectController>().playerModel.activeSelf)
             {
                 SetPosition();
                 rb.useGravity = true;
-                playerModel.SetActive(true);
+                hasInitialized = true;
             }
 
             if (!hasAuthority) return;
@@ -37,7 +32,6 @@ public class PlayerMovement : NetworkBehaviour
             if (Input.GetButtonDown("Jump"))
                 rb.AddForce(jumpForce * Vector3.up, ForceMode.Impulse);
         }
-        
     }
 
     public void SetPosition()

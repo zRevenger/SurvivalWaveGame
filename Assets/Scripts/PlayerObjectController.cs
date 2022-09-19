@@ -3,15 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using Steamworks;
+using UnityEngine.SceneManagement;
 
 public class PlayerObjectController : NetworkBehaviour
 {
+    public GameObject playerModel;
+
     //Player Data
     [SyncVar] public int connectionID;
     [SyncVar] public int playerIDNumber;
     [SyncVar] public ulong playerSteamID;
     [SyncVar(hook = nameof(PlayerNameUpdate))] public string playerName;
     [SyncVar(hook = nameof(PlayerReadyUpdate))] public bool ready;
+
+    //Class
+    [SyncVar(hook = nameof(SendPlayerClass))] public int playerClass;
 
     private NSNetworkManager networkManager;
 
@@ -29,6 +35,18 @@ public class PlayerObjectController : NetworkBehaviour
     private void Start()
     {
         DontDestroyOnLoad(this.gameObject);
+        playerModel.SetActive(false);
+    }
+
+    private void Update()
+    {
+        if(IsInGameScene())
+        {
+            if (!playerModel.activeSelf)
+            {
+                playerModel.SetActive(true);
+            }
+        }
     }
 
     public override void OnStartAuthority()
@@ -101,5 +119,36 @@ public class PlayerObjectController : NetworkBehaviour
     public void CmdCanStartGame(string sceneName)
     {
         networkManager.StartGame(sceneName);
+    }
+
+    //Class
+    [Command]
+    public void CmdUpdatePlayerClass(int newValue)
+    {
+        SendPlayerClass(playerClass, newValue);
+    }
+
+    public void SendPlayerClass(int oldValue, int newValue)
+    {
+        if (isServer)
+        {
+            playerClass = newValue;
+            Debug.Log(playerClass);
+        }
+        if(isClient && oldValue != newValue)
+        {
+            UpdateClass(newValue);
+        }
+    }
+
+    //it's weird but it's done 'cause sometimes it's buggy
+    void UpdateClass(int message)
+    {
+        playerClass = message;
+    }
+    
+    public bool IsInGameScene()
+    {
+        return SceneManager.GetActiveScene().name == "Map1";
     }
 }
