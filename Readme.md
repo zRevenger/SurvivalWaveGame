@@ -1,2 +1,1 @@
-###WARNING
-##Possibly unstable
+Stable version
