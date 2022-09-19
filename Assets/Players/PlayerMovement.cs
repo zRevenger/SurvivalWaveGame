@@ -10,6 +10,7 @@ public class PlayerMovement : NetworkBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        rb.useGravity = false;
     }
 
     private void Start()
@@ -24,6 +25,7 @@ public class PlayerMovement : NetworkBehaviour
             if (!playerModel.activeSelf)
             {
                 SetPosition();
+                rb.useGravity = true;
                 playerModel.SetActive(true);
             }
 
@@ -40,7 +42,7 @@ public class PlayerMovement : NetworkBehaviour
 
     public void SetPosition()
     {
-        transform.position = new Vector3(Random.Range(-5, 5), 0.8f, Random.Range(-15, 7));
+        transform.position = new Vector3(Random.Range(-5, 5), .8f, Random.Range(-15, 7));
     }
 
     #region MovementVars

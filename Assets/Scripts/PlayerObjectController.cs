@@ -28,7 +28,7 @@ public class PlayerObjectController : NetworkBehaviour
 
     private void Start()
     {
-        DontDestroyOnLoad(gameObject);
+        DontDestroyOnLoad(this.gameObject);
     }
 
     public override void OnStartAuthority()
