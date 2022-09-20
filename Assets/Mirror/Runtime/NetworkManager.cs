@@ -381,9 +381,15 @@ namespace Mirror
         /// <summary>Starts a network "host" - a server and client in the same application.</summary>
         public void StartHost()
         {
-            if (NetworkServer.active || NetworkClient.active)
+            if (NetworkClient.active)
             {
-                Debug.LogWarning("Server or Client already started.");
+                Debug.LogWarning("Client already started.");
+                return;
+            }
+
+            if (NetworkServer.active)
+            {
+                Debug.LogWarning("Server already started.");
                 return;
             }
 

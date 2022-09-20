@@ -6,6 +6,7 @@ using Steamworks;
 using TMPro;
 using UnityEngine.UI;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class LobbyController : MonoBehaviour
 {
@@ -206,5 +207,10 @@ public class LobbyController : MonoBehaviour
                 objectToRemove = null;
             }
         }
+    }
+
+    public void LeaveLobby()
+    {
+        localPlayerController.LeaveLobby();
     }
 }

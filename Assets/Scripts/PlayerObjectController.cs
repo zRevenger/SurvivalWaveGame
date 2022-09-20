@@ -19,7 +19,7 @@ public class PlayerObjectController : NetworkBehaviour
     //Class
     [SyncVar(hook = nameof(SendPlayerClass))] public int playerClass;
 
-    private NSNetworkManager networkManager;
+    /*private NSNetworkManager networkManager;
 
     private NSNetworkManager _networkManager
     {
@@ -30,7 +30,7 @@ public class PlayerObjectController : NetworkBehaviour
 
             return networkManager = NSNetworkManager.singleton as NSNetworkManager;
         }
-    }
+    }*/
 
     private void Start()
     {
@@ -59,14 +59,14 @@ public class PlayerObjectController : NetworkBehaviour
 
     public override void OnStartClient()
     {
-        _networkManager.players.Add(this);
+        NSNetworkManager.singleton.GetComponent<NSNetworkManager>().players.Add(this);
         LobbyController.instance.UpdateLobbyName();
         LobbyController.instance.UpdatePlayerList();
     }
 
     public override void OnStopClient()
     {
-        networkManager.players.Remove(this);
+        NSNetworkManager.singleton.GetComponent<NSNetworkManager>().players.Remove(this);
         LobbyController.instance.UpdatePlayerList();
     }
 
@@ -118,7 +118,7 @@ public class PlayerObjectController : NetworkBehaviour
     [Command]
     public void CmdCanStartGame(string sceneName)
     {
-        networkManager.StartGame(sceneName);
+        NSNetworkManager.singleton.GetComponent<NSNetworkManager>().StartGame(sceneName);
     }
 
     //Class
@@ -133,7 +133,6 @@ public class PlayerObjectController : NetworkBehaviour
         if (isServer)
         {
             playerClass = newValue;
-            Debug.Log(playerClass);
         }
         if(isClient && oldValue != newValue)
         {
@@ -150,5 +149,28 @@ public class PlayerObjectController : NetworkBehaviour
     public bool IsInGameScene()
     {
         return SceneManager.GetActiveScene().name == "Map1";
+    }
+
+    public void LeaveLobby()
+    {
+        if(hasAuthority)
+        {
+            if (isServer)
+            {
+                NetworkServer.Shutdown();
+                NSNetworkManager.singleton.GetComponent<NSNetworkManager>().StopHost();
+            }
+            else
+                NSNetworkManager.singleton.GetComponent<NSNetworkManager>().StopClient();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if(hasAuthority)
+        {
+            LobbyController.instance.RemovePlayerItem();
+            SteamMatchmaking.LeaveLobby(new CSteamID(LobbyController.instance.currentLobbyID));
+        }
     }
 }

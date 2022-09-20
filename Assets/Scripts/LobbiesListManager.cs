@@ -12,7 +12,7 @@ public class LobbiesListManager : MonoBehaviour
     public GameObject lobbyDataItemPrefab;
     public GameObject lobbyListContent;
 
-    public GameObject lobbiesButton, hostButton;
+    public GameObject mainMenu;
 
     public List<GameObject> listOfLobbies = new List<GameObject>();
 
@@ -23,10 +23,6 @@ public class LobbiesListManager : MonoBehaviour
 
     public void GetListOfLobbies()
     {
-        lobbiesButton.SetActive(false);
-        hostButton.SetActive(false);
-        lobbiesMenu.SetActive(true);
-
         SteamLobby.instance.GetLobbiesList();
     }
 

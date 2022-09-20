@@ -23,7 +23,6 @@ public class SteamLobby : MonoBehaviour
     //Vars
     public ulong currentLobbyID;
     private const string hostAddressKey = "HostAddress";
-    private NSNetworkManager networkManager;
 
     private void Start()
     {
@@ -31,8 +30,6 @@ public class SteamLobby : MonoBehaviour
         if (!SteamManager.Initialized) return;
 
         if (instance == null) instance = this;
-
-        networkManager = GetComponent<NSNetworkManager>();
 
         LobbyCreatedCallback = Callback<LobbyCreated_t>.Create(OnLobbyCreated);
         JoinRequestCallback = Callback<GameLobbyJoinRequested_t>.Create(OnJoinRequest);
@@ -44,17 +41,20 @@ public class SteamLobby : MonoBehaviour
 
     public void HostLobby()
     {
-        SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePublic, networkManager.maxConnections);
+        Debug.Log("trying to host");
+        SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePublic, NSNetworkManager.singleton.maxConnections);
     }
 
     private void OnLobbyCreated(LobbyCreated_t callback)
     {
         //if something goes wrong with lobby creation don't continue executing 
-        if (callback.m_eResult != EResult.k_EResultOK) return;
+        if (callback.m_eResult != EResult.k_EResultOK)
+        {
+            Debug.Log(callback.m_eResult);
+            return;
+        }
 
-        Debug.Log("Lobby Created");
-
-        networkManager.StartHost();
+        NSNetworkManager.singleton.StartHost();
 
         //Set host key
         SteamMatchmaking.SetLobbyData(new CSteamID(callback.m_ulSteamIDLobby), hostAddressKey, SteamUser.GetSteamID().ToString());
@@ -64,7 +64,6 @@ public class SteamLobby : MonoBehaviour
 
     private void OnJoinRequest(GameLobbyJoinRequested_t callback)
     {
-        Debug.Log("Recieved join request");
         SteamMatchmaking.JoinLobby(callback.m_steamIDLobby);
     }
 
@@ -76,9 +75,9 @@ public class SteamLobby : MonoBehaviour
         //Client actions
         if (NetworkServer.active) return;
 
-        networkManager.networkAddress = SteamMatchmaking.GetLobbyData(new CSteamID(callback.m_ulSteamIDLobby), hostAddressKey);
+        NSNetworkManager.singleton.networkAddress = SteamMatchmaking.GetLobbyData(new CSteamID(callback.m_ulSteamIDLobby), hostAddressKey);
 
-        networkManager.StartClient();
+        NSNetworkManager.singleton.StartClient();
     }
 
     public void JoinLobby(CSteamID lobbyID)

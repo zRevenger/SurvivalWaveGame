@@ -11,6 +11,12 @@ public class ApplicationManager : MonoBehaviour
         if (instance == null) instance = this;
     }
 
+    private void Start()
+    {
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+    }
+
     public void Quit(int code = 0) 
     {
         // Do required activities before exiting

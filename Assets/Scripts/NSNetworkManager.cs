@@ -4,10 +4,19 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Steamworks;
 
+[DisallowMultipleComponent]
 public class NSNetworkManager : NetworkManager
 {
     [SerializeField] private PlayerObjectController gamePlayerPrefab;
     public List<PlayerObjectController> players { get; } = new List<PlayerObjectController>();
+
+    public override void Awake()
+    {
+        base.Awake();
+        //set transport to avoid issues
+        transport = FindObjectOfType<Mirror.FizzySteam.FizzySteamworks>();
+        Debug.Log(singleton.maxConnections);
+    }
 
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
@@ -20,6 +29,19 @@ public class NSNetworkManager : NetworkManager
             playerInstance.playerSteamID = (ulong)SteamMatchmaking.GetLobbyMemberByIndex((CSteamID)SteamLobby.instance.currentLobbyID, players.Count);
 
             NetworkServer.AddPlayerForConnection(conn, playerInstance.gameObject);
+        }
+    }
+
+    public override void OnServerDisconnect(NetworkConnectionToClient conn)
+    {
+        NetworkServer.DestroyPlayerForConnection(conn);
+        for(int i = 0; i < players.Count; i++)
+        {
+            if (players[i].connectionID == conn.connectionId)
+            {
+                players.Remove(players[i]);
+                break;
+            }
         }
     }
 
