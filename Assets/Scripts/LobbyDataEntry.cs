@@ -9,7 +9,10 @@ public class LobbyDataEntry : MonoBehaviour
     //Data
     public CSteamID lobbyID;
     public string lobbyName;
+    public string currentPlayers;
+    public string maxPlayers;
     public TextMeshProUGUI lobbyNameText;
+    public TextMeshProUGUI playerCountText;
 
     public void SetLobbyData()
     {
@@ -17,6 +20,8 @@ public class LobbyDataEntry : MonoBehaviour
             lobbyNameText.text = "Empty";
         else
             lobbyNameText.text = lobbyName;
+
+        playerCountText.text = currentPlayers + "/" + maxPlayers;
     }
 
     public void JoinLobby()

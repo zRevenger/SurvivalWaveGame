@@ -41,7 +41,6 @@ public class SteamLobby : MonoBehaviour
 
     public void HostLobby()
     {
-        Debug.Log("trying to host");
         SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePublic, NSNetworkManager.singleton.maxConnections);
     }
 
@@ -60,6 +59,8 @@ public class SteamLobby : MonoBehaviour
         SteamMatchmaking.SetLobbyData(new CSteamID(callback.m_ulSteamIDLobby), hostAddressKey, SteamUser.GetSteamID().ToString());
         //Set lobby name
         SteamMatchmaking.SetLobbyData(new CSteamID(callback.m_ulSteamIDLobby), "name", SteamFriends.GetPersonaName().ToString() + "'s Lobby");
+        SteamMatchmaking.SetLobbyData(new CSteamID(callback.m_ulSteamIDLobby), "currentPlayers", "0");
+        SteamMatchmaking.SetLobbyData(new CSteamID(callback.m_ulSteamIDLobby), "maxPlayers", NetworkManager.singleton.maxConnections.ToString());
     }
 
     private void OnJoinRequest(GameLobbyJoinRequested_t callback)
@@ -95,7 +96,6 @@ public class SteamLobby : MonoBehaviour
 
     public void OnGetLobbyList(LobbyMatchList_t result)
     {
-        Debug.Log("getting lobbies");
         if (LobbiesListManager.instance.listOfLobbies.Count > 0)
             LobbiesListManager.instance.DestroyLobbies();
 

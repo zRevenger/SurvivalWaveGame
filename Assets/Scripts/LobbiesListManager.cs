@@ -36,6 +36,8 @@ public class LobbiesListManager : MonoBehaviour
 
                 createdItem.GetComponent<LobbyDataEntry>().lobbyID = (CSteamID)lobbyIDs[i].m_SteamID;
                 createdItem.GetComponent<LobbyDataEntry>().lobbyName = SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDs[i].m_SteamID, "name");
+                createdItem.GetComponent<LobbyDataEntry>().currentPlayers = SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDs[i].m_SteamID, "currentPlayers");
+                createdItem.GetComponent<LobbyDataEntry>().maxPlayers = SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDs[i].m_SteamID, "maxPlayers");
 
                 createdItem.GetComponent<LobbyDataEntry>().SetLobbyData();
 

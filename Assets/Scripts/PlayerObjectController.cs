@@ -157,11 +157,12 @@ public class PlayerObjectController : NetworkBehaviour
         {
             if (isServer)
             {
-                NetworkServer.Shutdown();
                 NSNetworkManager.singleton.GetComponent<NSNetworkManager>().StopHost();
             }
             else
+            {
                 NSNetworkManager.singleton.GetComponent<NSNetworkManager>().StopClient();
+            }
         }
     }
 

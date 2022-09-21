@@ -15,7 +15,6 @@ public class NSNetworkManager : NetworkManager
         base.Awake();
         //set transport to avoid issues
         transport = FindObjectOfType<Mirror.FizzySteam.FizzySteamworks>();
-        Debug.Log(singleton.maxConnections);
     }
 
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
@@ -27,6 +26,8 @@ public class NSNetworkManager : NetworkManager
             playerInstance.connectionID = conn.connectionId;
             playerInstance.playerIDNumber = players.Count + 1;
             playerInstance.playerSteamID = (ulong)SteamMatchmaking.GetLobbyMemberByIndex((CSteamID)SteamLobby.instance.currentLobbyID, players.Count);
+
+            SteamMatchmaking.SetLobbyData(new CSteamID(LobbyController.instance.currentLobbyID), "currentPlayers", players.Count.ToString());
 
             NetworkServer.AddPlayerForConnection(conn, playerInstance.gameObject);
         }
