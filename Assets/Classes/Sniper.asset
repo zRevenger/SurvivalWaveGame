@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fdcada84eec4f0b4eb7feb215144224c, type: 3}
-  m_Name: Engineer
+  m_Name: Sniper
   m_EditorClassIdentifier: 
-  className: Engineer
-  tempColor: {fileID: 2100000, guid: 789f4d7ed7c19d24d8730f4592fec1ba, type: 2}
+  className: Sniper
+  tempColor: {fileID: 2100000, guid: 29a0ebde387129f48a4c5ea5fcc9c452, type: 2}

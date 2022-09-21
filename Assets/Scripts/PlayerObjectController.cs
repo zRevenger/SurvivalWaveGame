@@ -54,13 +54,13 @@ public class PlayerObjectController : NetworkBehaviour
         CmdSetPlayerName(SteamFriends.GetPersonaName().ToString());
         gameObject.name = "LocalGamePlayer";
         LobbyController.instance.FindLocalPlayer();
-        LobbyController.instance.UpdateLobbyName();
+        LobbyController.instance.InitializeLobbyName();
     }
 
     public override void OnStartClient()
     {
         NSNetworkManager.singleton.GetComponent<NSNetworkManager>().players.Add(this);
-        LobbyController.instance.UpdateLobbyName();
+        LobbyController.instance.InitializeLobbyName();
         LobbyController.instance.UpdatePlayerList();
     }
 
@@ -153,7 +153,16 @@ public class PlayerObjectController : NetworkBehaviour
 
     public void LeaveLobby()
     {
-        if(hasAuthority)
+        //Set the offline scene to null
+        NSNetworkManager.singleton.GetComponent<NSNetworkManager>().offlineScene = "";
+
+        //Make the active scene the offline scene
+        SceneManager.LoadScene("MainMenu");
+
+        //Leave Steam Lobby
+        SteamLobby.instance.LeaveLobby();
+
+        if (hasAuthority)
         {
             if (isServer)
             {
@@ -163,15 +172,6 @@ public class PlayerObjectController : NetworkBehaviour
             {
                 NSNetworkManager.singleton.GetComponent<NSNetworkManager>().StopClient();
             }
-        }
-    }
-
-    private void OnDestroy()
-    {
-        if(hasAuthority)
-        {
-            LobbyController.instance.RemovePlayerItem();
-            SteamMatchmaking.LeaveLobby(new CSteamID(LobbyController.instance.currentLobbyID));
         }
     }
 }

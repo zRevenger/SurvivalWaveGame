@@ -13,7 +13,7 @@ public class LobbyController : MonoBehaviour
     public static LobbyController instance;
 
     //UI elements
-    public TextMeshProUGUI lobbyNameText;
+    public TMP_InputField lobbyNameText;
 
     //Player Data
     public GameObject playerListViewContent;
@@ -95,10 +95,17 @@ public class LobbyController : MonoBehaviour
         localPlayerController.CanStartGame(sceneName);
     }
 
-    public void UpdateLobbyName()
+    public void InitializeLobbyName()
     {
         currentLobbyID = networkManager.GetComponent<SteamLobby>().currentLobbyID;
         lobbyNameText.text = SteamMatchmaking.GetLobbyData(new CSteamID(currentLobbyID), "name");
+    }
+
+    public void UpdateLobbyName()
+    {
+        SteamMatchmaking.SetLobbyData(new CSteamID(currentLobbyID), "name", lobbyNameText.text);
+        Debug.Log(SteamMatchmaking.GetLobbyData(new CSteamID(currentLobbyID), "name"));
+        InitializeLobbyName();
     }
 
     public void UpdatePlayerList()
@@ -118,6 +125,10 @@ public class LobbyController : MonoBehaviour
     {
         localPlayerObject = GameObject.Find("LocalGamePlayer");
         localPlayerController = localPlayerObject.GetComponent<PlayerObjectController>();
+        if (localPlayerController.isServer)
+            lobbyNameText.interactable = true;
+        else
+            lobbyNameText.interactable = false;
     }
 
     public void CreateHostPlayerItem()
@@ -131,7 +142,7 @@ public class LobbyController : MonoBehaviour
             newPlayerItemScript.connectionID = player.connectionID;
             newPlayerItemScript.playerSteamID = player.playerSteamID;
             newPlayerItemScript.ready = player.ready;
-            newPlayerItemScript.SetPlayerValues();
+            newPlayerItemScript.SetPlayerValues(player.isServer);
 
             newPlayerItem.transform.SetParent(playerListViewContent.transform);
             newPlayerItem.transform.localScale = Vector3.one;
@@ -154,7 +165,7 @@ public class LobbyController : MonoBehaviour
                 newPlayerItemScript.connectionID = player.connectionID;
                 newPlayerItemScript.playerSteamID = player.playerSteamID;
                 newPlayerItemScript.ready = player.ready;
-                newPlayerItemScript.SetPlayerValues();
+                newPlayerItemScript.SetPlayerValues(player.isServer);
 
                 newPlayerItem.transform.SetParent(playerListViewContent.transform);
                 newPlayerItem.transform.localScale = Vector3.one;
@@ -174,7 +185,7 @@ public class LobbyController : MonoBehaviour
                 {
                     playerListItemScript.playerName = player.playerName;
                     playerListItemScript.ready = player.ready;
-                    playerListItemScript.SetPlayerValues();
+                    playerListItemScript.SetPlayerValues(player.isServer);
                     if(player == localPlayerController)
                     {
                         UpdateButton();

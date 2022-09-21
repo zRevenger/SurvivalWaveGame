@@ -14,6 +14,7 @@ public class PlayerListItem : MonoBehaviour
 
     public TextMeshProUGUI playerNameText;
     public RawImage playerIcon;
+    public Image hostIcon;
 
     public TextMeshProUGUI playerReadyText;
     public bool ready;
@@ -47,12 +48,15 @@ public class PlayerListItem : MonoBehaviour
             return;
     }
 
-    public void SetPlayerValues()
+    public void SetPlayerValues(bool isHost)
     {
         playerNameText.text = playerName;
         ChangeReadyStatus();
         if (!avatarReceived)
             GetPlayerIcon();
+
+        if (isHost)
+            hostIcon.gameObject.SetActive(true);
     }
 
     void GetPlayerIcon()

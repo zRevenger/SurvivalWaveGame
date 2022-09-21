@@ -21,6 +21,11 @@ public class LobbiesListManager : MonoBehaviour
         if (instance == null) instance = this;
     }
 
+    public void HostLobby()
+    {
+        NSNetworkManager.singleton.GetComponent<SteamLobby>().HostLobby();
+    }
+
     public void GetListOfLobbies()
     {
         SteamLobby.instance.GetLobbiesList();
