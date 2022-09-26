@@ -148,7 +148,7 @@ public class PlayerObjectController : NetworkBehaviour
     
     public bool IsInGameScene()
     {
-        return SceneManager.GetActiveScene().name == "Map1";
+        return SceneManager.GetActiveScene().name == "Village";
     }
 
     public void LeaveLobby()
