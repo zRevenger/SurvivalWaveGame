@@ -26,7 +26,7 @@ public class CameraController : NetworkBehaviour
     {
         if(GetComponent<PlayerObjectController>().IsInGameScene())
         {
-            if (!hasInitialized && GetComponent<PlayerObjectController>().playerModel.activeSelf && hasAuthority)
+            if (!hasInitialized && hasAuthority)
             {
                 camRef.gameObject.SetActive(true);
                 Cursor.visible = false;

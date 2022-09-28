@@ -55,6 +55,8 @@ public class SteamLobby : MonoBehaviour
 
         NSNetworkManager.singleton.StartHost();
 
+        //Lobby identifier
+        SteamMatchmaking.SetLobbyData(new CSteamID(callback.m_ulSteamIDLobby), "isSurvivalGame", "true");
         //Set host key
         SteamMatchmaking.SetLobbyData(new CSteamID(callback.m_ulSteamIDLobby), hostAddressKey, SteamUser.GetSteamID().ToString());
         //Set lobby name

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62b23166a9aaa7440ab66023ae7b6370, type: 3}
   m_Name: DesertEagle
   m_EditorClassIdentifier: 
-  weaponPrefab: {fileID: 4658425927503058459, guid: ac4c5c4437ec4e14c8239d775efacd5f,
+  weaponPrefab: {fileID: 1107488315134258261, guid: b9ece091e00c90a4eb19808ee64eed02,
     type: 3}
   weaponIcon: {fileID: 0}
   weaponType: 1

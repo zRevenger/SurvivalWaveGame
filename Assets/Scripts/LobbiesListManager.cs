@@ -37,6 +37,8 @@ public class LobbiesListManager : MonoBehaviour
         {
             if (lobbyIDs[i].m_SteamID == result.m_ulSteamIDLobby)
             {
+                if (SteamMatchmaking.GetLobbyData((CSteamID)lobbyIDs[i].m_SteamID, "isSurvivalGame") != "true") continue;
+
                 GameObject createdItem = Instantiate(lobbyDataItemPrefab);
 
                 createdItem.GetComponent<LobbyDataEntry>().lobbyID = (CSteamID)lobbyIDs[i].m_SteamID;

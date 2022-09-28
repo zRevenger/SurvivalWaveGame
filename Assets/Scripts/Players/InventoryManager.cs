@@ -24,11 +24,17 @@ public class InventoryManager : NetworkBehaviour
     public int totalShotgunAmmo;
     public int totalPistolAmmo;
 
+    public float pickupRange = 2.5f;
+
+    private PlayerObjectController playerObjectController;
+    private CameraController cameraController;
+
     private void Start()
     {
         combatManager = GetComponent<CombatManager>();
+        playerObjectController = GetComponent<PlayerObjectController>();
+        cameraController = GetComponent<CameraController>();
         secondaryWeapon = combatManager.weaponData[0];
-        selectedSlot = 1;
 
         currentSecondaryAmmo = secondaryWeapon.clipMaxAmmo;
 
@@ -39,8 +45,9 @@ public class InventoryManager : NetworkBehaviour
 
     private void Update()
     {
-        if (GetComponent<PlayerObjectController>().IsInGameScene())
+        if (playerObjectController.IsInGameScene())
         {
+
             if (!hasAuthority) return;
 
             if (!SceneManager.GetSceneByName("GameUI").isLoaded && !uiLoading)
@@ -80,6 +87,7 @@ public class InventoryManager : NetworkBehaviour
             uiReference.SelectSlot(selectedSlot);
             UpdateCurrentAmmoUI(1);
             UpdateTotalAmmoUI(1);
+            SelectSlot(1);
         }
 
         if (uiReference == null) return;
@@ -126,13 +134,36 @@ public class InventoryManager : NetworkBehaviour
     {
         selectedSlot = slot;
         uiReference.SelectSlot(selectedSlot);
+        if ((slot == 0 && primaryWeapon != null) || (slot == 1 && secondaryWeapon != null))
+        {
+            CmdChangeWeaponModel(slot);
+        }
+    }
+
+    [ClientRpc]
+    private void ChangeWeaponModel(int slot)
+    {
+        ItemPlacingReference reference = playerObjectController.playerModel.GetComponent<ItemPlacingReference>();
+        if (reference.gunPlacingTransform.childCount > 0)
+            Destroy(reference.gunPlacingTransform.GetChild(0).gameObject);
+
+        GameObject objectToInstantiate = slot == 0 ? primaryWeapon.weaponPrefab : secondaryWeapon.weaponPrefab;
+
+        GameObject instantiatedWeapon = Instantiate(objectToInstantiate, reference.gunPlacingTransform);
+        instantiatedWeapon.transform.localRotation = Quaternion.Euler(new Vector3(-170, 85, 90));
+    }
+
+    [Command]
+    private void CmdChangeWeaponModel(int slot)
+    {
+        ChangeWeaponModel(slot);
     }
 
     private void CheckPickup()
     {
         RaycastHit hit;
         Ray ray = new Ray(GetComponent<CameraController>().camRef.transform.position, GetComponent<CameraController>().camRef.transform.forward);
-        if (Physics.Raycast(ray, out hit))
+        if (Physics.Raycast(ray, out hit, pickupRange))
         {
             PickupObject pickupData = hit.collider.GetComponent<PickupObject>();
             if (pickupData != null)
@@ -142,8 +173,9 @@ public class InventoryManager : NetworkBehaviour
                     HandlePickup(pickupData);
             }
             else
-                uiReference.pickupText.SetActive(false);
-        }
+                uiReference.pickupText.SetActive(false); 
+        } else
+            uiReference.pickupText.SetActive(false);
     }
 
     private void HandlePickup(PickupObject pickupData)
@@ -158,31 +190,47 @@ public class InventoryManager : NetworkBehaviour
                 {
                     if (primaryWeapon != null)
                     {
-                        pickupData.objectData = primaryWeapon;
-                        pickupData.UpdatePickup(currentPrimaryAmmo);
+                        for(int i = 0; i < combatManager.weaponData.Count; i++)
+                        {
+                            if (combatManager.weaponData[i] == primaryWeapon)
+                            {
+                                pickupData.CmdUpdatePickup(i, currentPrimaryAmmo);
+                                break;
+                            }
+                        }
                     }
                     else
-                        Destroy(pickupData.gameObject);
+                        pickupData.CmdClearPickup();
 
                     currentPrimaryAmmo = newClipSize;
                     primaryWeapon = weapon;
                     UpdateCurrentAmmoUI(0);
                     UpdateTotalAmmoUI(0);
+                    if (selectedSlot == 0)
+                        CmdChangeWeaponModel(0);
                 }
                 else
                 {
                     if (secondaryWeapon != null)
                     {
-                        pickupData.objectData = secondaryWeapon;
-                        pickupData.UpdatePickup(currentSecondaryAmmo);
+                        for (int i = 0; i < combatManager.weaponData.Count; i++)
+                        {
+                            if (combatManager.weaponData[i] == secondaryWeapon)
+                            {
+                                pickupData.CmdUpdatePickup(i, currentSecondaryAmmo);
+                                break;
+                            }
+                        }
                     }
                     else
-                        Destroy(pickupData.gameObject);
+                        pickupData.CmdClearPickup();
 
                     currentSecondaryAmmo = newClipSize;
                     secondaryWeapon = weapon;
                     UpdateCurrentAmmoUI(1);
                     UpdateTotalAmmoUI(1);
+                    if(selectedSlot == 1)
+                        CmdChangeWeaponModel(1);
                 }
             }
         }

@@ -4,11 +4,13 @@ using UnityEngine.SceneManagement;
 
 public class PlayerMovement : NetworkBehaviour
 {
+    private PlayerObjectController playerObjectController;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
+        playerObjectController = GetComponent<PlayerObjectController>();
     }
 
     private bool hasInitialized;
@@ -17,9 +19,9 @@ public class PlayerMovement : NetworkBehaviour
 
     private void Update()
     {
-        if(GetComponent<PlayerObjectController>().IsInGameScene())
+        if(playerObjectController.IsInGameScene())
         {
-            if (!hasInitialized && GetComponent<PlayerObjectController>().playerModel.activeSelf)
+            if (!hasInitialized)
             {
                 SetPosition();
                 rb.useGravity = true;
@@ -55,6 +57,11 @@ public class PlayerMovement : NetworkBehaviour
 
             HandleDrag();
             SpeedControl();
+
+            playerObjectController.animator.SetBool("isGrounded", isGrounded);
+            playerObjectController.animator.SetBool("isMoving", inputAxis.magnitude > 0);
+            playerObjectController.animator.SetFloat("verticalInput", inputAxis.y);
+            playerObjectController.animator.SetFloat("horizontalInput", inputAxis.x);
         }
     }
 
@@ -78,7 +85,7 @@ public class PlayerMovement : NetworkBehaviour
 
     public void FixedUpdate()
     {
-        if (GetComponent<PlayerObjectController>().IsInGameScene())
+        if (playerObjectController.IsInGameScene())
         {
             if (!hasAuthority) return;
 

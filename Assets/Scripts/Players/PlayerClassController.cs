@@ -6,23 +6,25 @@ using UnityEngine.SceneManagement;
 
 public class PlayerClassController : NetworkBehaviour
 {
-    public GameObject playerModel;
+    public GameObject[] playerModels;
 
-    public MeshRenderer mesh;
+    //public MeshRenderer mesh;
     public PlayableClass[] classes;
+
+    private PlayerObjectController playerObjectController;
 
     private void Start()
     {
-        playerModel.SetActive(false);
+        playerObjectController = GetComponent<PlayerObjectController>();
     }
 
     private bool hasInitialized;
 
     private void Update()
     {
-        if (GetComponent<PlayerObjectController>().IsInGameScene())
+        if (playerObjectController.IsInGameScene())
         {
-            if (!hasInitialized && GetComponent<PlayerObjectController>().playerModel.activeSelf)
+            if (!hasInitialized )
             {
                 PlayerClassModelSetup();
                 hasInitialized = true;
@@ -34,6 +36,21 @@ public class PlayerClassController : NetworkBehaviour
 
     public void PlayerClassModelSetup()
     {
-        mesh.material = classes[GetComponent<PlayerObjectController>().playerClass].tempColor;
+        for(int i = 0; i < classes.Length; i++)
+        {
+            if(playerObjectController.playerClass == i)
+            {
+                playerModels[i].SetActive(true);
+                playerObjectController.playerModel = playerModels[i];
+                playerObjectController.animator = playerModels[i].GetComponent<Animator>();
+                if (hasAuthority)
+                {
+                    playerObjectController.playerModel.transform.GetChild(0).gameObject.SetActive(false);
+                    playerObjectController.playerModel.transform.GetChild(1).gameObject.SetActive(false);
+                }
+                break;
+            }
+        }
+        //mesh.material = classes[GetComponent<PlayerObjectController>().playerClass].tempColor;
     }
 }

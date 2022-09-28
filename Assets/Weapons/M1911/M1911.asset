@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62b23166a9aaa7440ab66023ae7b6370, type: 3}
   m_Name: M1911
   m_EditorClassIdentifier: 
-  weaponPrefab: {fileID: 7309469641500156664, guid: 746e734a4270d0a4a8fd6dea3288e715,
+  weaponPrefab: {fileID: 2396742769464368171, guid: e1741d7af759dcb47acaf5e4fa6dab81,
     type: 3}
   weaponIcon: {fileID: 0}
   weaponType: 1
   ammoUsageType: 0
   ammoType: 1
-  damagePerBullet: 25
+  damagePerBullet: 20
   bulletAmount: 1
-  clipMaxAmmo: 20
+  clipMaxAmmo: 15
   isMelee: 0

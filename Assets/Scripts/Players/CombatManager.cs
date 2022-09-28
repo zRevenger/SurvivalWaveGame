@@ -28,11 +28,18 @@ public class CombatManager : IDamageable
             currentHealth = maxHealth;
     }
 
+    [ClientRpc]
     public override void OnDamage(int amount)
     {
         currentHealth -= amount;
         if (currentHealth <= 0)
             Die();
+    }
+
+    [Command(requiresAuthority = false)]
+    public override void CmdDamage(int amount)
+    {
+        OnDamage(amount);
     }
 
     private void Update()
@@ -55,14 +62,36 @@ public class CombatManager : IDamageable
         {
             inventoryManager.currentPrimaryAmmo--;
             inventoryManager.UpdateCurrentAmmoUI(0);
+            RaycastHit hit;
+            Ray ray = new Ray(GetComponent<CameraController>().camRef.transform.position, GetComponent<CameraController>().camRef.transform.forward);
+            if (Physics.Raycast(ray, out hit, 40f))
+            {
+                if (hit.collider.CompareTag("Enemy"))
+                    DamageEnemy(hit.collider.GetComponent<BaseEnemy>(), 0);
+            }
         }
 
         if (inventoryManager.selectedSlot == 1 && inventoryManager.currentSecondaryAmmo > 0 && !inventoryManager.secondaryWeapon.isMelee)
         {
             inventoryManager.currentSecondaryAmmo--;
             inventoryManager.UpdateCurrentAmmoUI(1);
+            RaycastHit hit;
+            Ray ray = new Ray(GetComponent<CameraController>().camRef.transform.position, GetComponent<CameraController>().camRef.transform.forward);
+            if (Physics.Raycast(ray, out hit, 40f))
+            {
+                if (hit.collider.CompareTag("Enemy"))
+                    DamageEnemy(hit.collider.GetComponent<BaseEnemy>(), 1);
+            }
         }
-        
+    }
+    
+    [Command]
+    private void DamageEnemy(BaseEnemy enemy, int slot)
+    {
+        if (slot == 0)
+            enemy.CmdDamage(inventoryManager.primaryWeapon.damagePerBullet);
+        else
+            enemy.CmdDamage(inventoryManager.secondaryWeapon.damagePerBullet);
     }
 
     public void Reload()
@@ -124,7 +153,6 @@ public class CombatManager : IDamageable
             else
             {
                 int requiredAmmo = inventoryManager.secondaryWeapon.clipMaxAmmo - inventoryManager.currentSecondaryAmmo;
-                Debug.LogAssertion(requiredAmmo);
                 switch(inventoryManager.secondaryWeapon.ammoType)
                 {
                     case EAmmoType.Pistol:

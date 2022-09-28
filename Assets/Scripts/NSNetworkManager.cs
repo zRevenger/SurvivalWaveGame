@@ -41,6 +41,7 @@ public class NSNetworkManager : NetworkManager
             if (players[i].connectionID == conn.connectionId)
             {
                 players.Remove(players[i]);
+                SteamMatchmaking.SetLobbyData(new CSteamID(LobbyController.instance.currentLobbyID), "currentPlayers", players.Count.ToString());
                 break;
             }
         }

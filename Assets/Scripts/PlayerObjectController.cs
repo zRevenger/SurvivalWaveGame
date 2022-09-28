@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 public class PlayerObjectController : NetworkBehaviour
 {
     public GameObject playerModel;
+    public Animator animator;
 
     //Player Data
     [SyncVar] public int connectionID;
@@ -35,17 +36,21 @@ public class PlayerObjectController : NetworkBehaviour
     private void Start()
     {
         DontDestroyOnLoad(this.gameObject);
-        playerModel.SetActive(false);
     }
+
+    private bool hasInitialized;
 
     private void Update()
     {
         if(IsInGameScene())
         {
-            if (!playerModel.activeSelf)
+            if (!hasInitialized)
             {
-                playerModel.SetActive(true);
+                hasInitialized = true;
             }
+
+            if (!hasAuthority) return;
+
         }
     }
 

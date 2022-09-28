@@ -101,6 +101,7 @@ public class LobbyController : MonoBehaviour
         lobbyNameText.text = SteamMatchmaking.GetLobbyData(new CSteamID(currentLobbyID), "name");
     }
 
+    
     public void UpdateLobbyName()
     {
         SteamMatchmaking.SetLobbyData(new CSteamID(currentLobbyID), "name", lobbyNameText.text);
@@ -165,6 +166,7 @@ public class LobbyController : MonoBehaviour
                 newPlayerItemScript.connectionID = player.connectionID;
                 newPlayerItemScript.playerSteamID = player.playerSteamID;
                 newPlayerItemScript.ready = player.ready;
+                Debug.Log(player.playerName + " | " + player.isServer);
                 newPlayerItemScript.SetPlayerValues(player.isServer);
 
                 newPlayerItem.transform.SetParent(playerListViewContent.transform);
