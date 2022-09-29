@@ -56,7 +56,20 @@ public class InventoryManager : NetworkBehaviour
                 SceneManager.LoadSceneAsync("GameUI", LoadSceneMode.Additive);
             }
 
-            if (Input.GetKeyDown(KeyCode.Alpha1))
+            if (Input.GetAxis("Mouse ScrollWheel") > 0)
+            {
+                int newSlot = selectedSlot == 3 ? primaryWeapon == null ? 1 : 0 : ++selectedSlot;
+                SelectSlot(newSlot);
+            }
+            if (Input.GetAxis("Mouse ScrollWheel") < 0)
+            {
+                int newSlot = selectedSlot == 0 ? 3 
+                            : selectedSlot == 1 && primaryWeapon == null ? 3 
+                            : --selectedSlot;
+                SelectSlot(newSlot);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha1) && primaryWeapon != null)
                 SelectSlot(0);
             else if (Input.GetKeyDown(KeyCode.Alpha2))
                 SelectSlot(1);
